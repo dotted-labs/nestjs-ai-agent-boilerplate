@@ -19,7 +19,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 // Import tool factory functions
 import { createPublicTenderTool } from '../tools/public-tender.tool';
 import { createVectorSearchTool } from '../tools/vector-search.tool';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../../../config/config.service';
 
 // Interface for conversation history items from Supabase
 interface ConversationHistoryItem {
@@ -102,22 +102,23 @@ export class AgentService {
 
     // Initialize Model
     this.model = new ChatOpenAI({
-      modelName: this.configService.get('OPENAI_MODEL'),
-      openAIApiKey: this.configService.get('OPENAI_API_KEY'),
+      modelName: this.configService.openAiModel,
+      openAIApiKey: this.configService.openAiApiKey,
       temperature: 0.2,
       streaming: true,
     });
 
     // Create Tool Instances using factories
-    const vectorSearchToolInstance = createVectorSearchTool(
-      this.supabaseService.client,
-      this.configService,
-    );
-    const publicTenderToolInstance = createPublicTenderTool(
-      this.supabaseService.client,
-    );
+    // const vectorSearchToolInstance = createVectorSearchTool(
+    //   this.supabaseService.client,
+    //   this.configService,
+    // );
+    // const publicTenderToolInstance = createPublicTenderTool(
+    //   this.supabaseService.client,
+    // );
 
-    this.agentTools = [vectorSearchToolInstance, publicTenderToolInstance];
+    // this.agentTools = [vectorSearchToolInstance, publicTenderToolInstance];
+    this.agentTools = [];
 
     // Create a memory saver for persistent conversation state
     const agentCheckpointer = new MemorySaver();

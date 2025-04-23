@@ -2,7 +2,7 @@ import { DynamicTool } from '@langchain/core/tools';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { ConfigService } from '../config/config.service';
+import { ConfigService } from '../../../config/config.service';
 
 interface TenderData {
   id: number;
