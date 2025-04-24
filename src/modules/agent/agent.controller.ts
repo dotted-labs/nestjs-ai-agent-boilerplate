@@ -1,13 +1,13 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ChatDto } from './dto/chat.dto';
-import { AgentService } from './services/agent.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ChatService } from './services/chat.service';
 
 @ApiTags('Agent')
 @Controller('agent')
 export class AgentController {
-  constructor(private readonly agentService: AgentService) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @ApiOperation({ summary: 'Chat with the AI agent' })
   @ApiResponse({
@@ -16,12 +16,7 @@ export class AgentController {
   })
   @Post('chat')
   async chat(@Body() chatDto: ChatDto, @Res() res: Response) {
-    const result = await this.agentService.chat(
-      chatDto.message,
-      chatDto.threadId || '',
-      res,
-    );
-
-    return res.json(result);
+    console.log('chatDto:', chatDto);
+    await this.chatService.chat(chatDto.message, chatDto.threadId || '', res);
   }
 }

@@ -1,0 +1,81 @@
+<html>
+  <body>
+    <div id="chat">
+      <div id="messages"></div>
+      <div id="loader" style="display: none">Loading...</div>
+      <div id="tool-results"></div>
+    </div>
+
+    <script>
+      const chatDiv = document.getElementById('messages');
+      const loaderDiv = document.getElementById('loader');
+      const toolResultsDiv = document.getElementById('tool-results');
+
+      const es = new EventSource(
+        'http://localhost:3000/agent/chat2?message=Como estas? dame 5 personas aleatorias&threadId=abc',
+      );
+
+      // Placeholder functions
+      function appendToChatBubble(text) {
+        // Check if there's an existing message element
+        let lastMessage = chatDiv.lastElementChild;
+
+        // If no message exists or the last one is marked as complete, create a new one
+        if (!lastMessage || lastMessage.dataset.complete === 'true') {
+          lastMessage = document.createElement('p');
+          chatDiv.appendChild(lastMessage);
+        }
+
+        // Append text to the existing message
+        lastMessage.textContent += text;
+        console.log('Message appended:', text);
+      }
+
+      function renderToolResult(toolResult) {
+        const pre = document.createElement('pre');
+        // Display the stringified JSON of the tool result
+        pre.textContent = JSON.stringify(toolResult, null, 2); // Pretty print JSON
+        chatDiv.appendChild(pre);
+        loaderDiv.style.display = 'none'; // Hide loader when tool result is shown
+        console.log('Tool Result:', toolResult);
+      }
+
+      function showLoader() {
+        loaderDiv.style.display = 'block'; // Show loader
+        console.log('Tool Start: Showing loader');
+      }
+
+      // Consolidated Event Listeners
+      es.addEventListener('message', (e) => {
+        // Fragmento de texto normal
+        appendToChatBubble(e.data);
+      });
+
+      es.addEventListener('tool_start', () => {
+        showLoader();
+      });
+
+      es.addEventListener('tool', (e) => {
+        // Esto es un JSON => respuesta de la tool
+        try {
+          const toolResult = JSON.parse(e.data);
+          renderToolResult(toolResult);
+        } catch (error) {
+          console.error('Error parsing tool data:', error, e.data);
+          appendToChatBubble(`Error displaying tool result: ${e.data}`); // Show raw data on error
+        }
+      });
+
+      es.addEventListener('done', () => {
+        console.log('SSE connection closed by server.');
+        es.close();
+      });
+
+      es.onerror = (err) => {
+        console.error('SSE error:', err);
+        appendToChatBubble('Error connecting to the stream.'); // Inform user
+        es.close();
+      };
+    </script>
+  </body>
+</html>

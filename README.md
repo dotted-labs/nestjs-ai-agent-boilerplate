@@ -1,98 +1,140 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS AI Agent Boilerplate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A modern NestJS-based boilerplate for building AI agents using LangChain.js and LangGraph. This project provides a solid foundation for creating AI-powered applications with streaming responses, tool execution, and persistent conversation memory.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- **AI Agent Integration**: Built with LangChain.js and LangGraph for sophisticated agent workflows
+- **OpenAI Integration**: Pre-configured to work with GPT models
+- **Streaming Responses**: Server-Sent Events (SSE) for real-time streaming responses
+- **Tool Framework**: Extensible tool system with Zod schema validation
+- **Conversation Memory**: Persistent memory across conversation sessions
+- **API Documentation**: Swagger UI integration for exploring and testing endpoints
+- **Supabase Integration**: Pre-configured for database storage
+- **TypeScript**: Fully typed codebase for better development experience
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
 
-## Project setup
+- Node.js (v18 or higher)
+- An OpenAI API key
+- Supabase account (optional)
+
+## Getting Started
+
+### Installation
 
 ```bash
-$ npm install
+# Clone the repository
+git clone https://github.com/yourusername/nestjs-ai-agent-boilerplate.git
+
+# Install dependencies
+cd nestjs-ai-agent-boilerplate
+npm install
 ```
 
-## Compile and run the project
+### Configuration
+
+1. Create a `.env` file based on the following template:
+
+```env
+# Environment
+NODE_ENV=development
+PORT=3000
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
+
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+```
+
+### Running the Application
 
 ```bash
-# development
-$ npm run start
+# Development mode
+npm run start:dev
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Production mode
+npm run build
+npm run start:prod
 ```
 
-## Run tests
+Once running, access the Swagger documentation at: http://localhost:3000/api/docs
 
-```bash
-# unit tests
-$ npm run test
+## Project Structure
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+src/
+├── config/           # Application configuration
+├── db/               # Database connections (Supabase)
+├── modules/
+│   └── agent/        # AI Agent implementation
+│       ├── dto/      # Data transfer objects
+│       ├── services/ # Agent services
+│       └── tools/    # Custom tools for the agent
+└── types/            # TypeScript type definitions
 ```
 
-## Deployment
+## How It Works
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+The application creates an AI agent using LangGraph's reactive agent framework, allowing for:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. **User Interactions**: Users send messages through the `/agent/chat` endpoint
+2. **Streaming Responses**: The agent processes requests and streams responses in real-time
+3. **Tool Usage**: The agent can use tools like the table generator to create structured data
+4. **Memory Management**: Conversations are stored by thread ID, maintaining context between interactions
 
-```bash
-$ npm install -g mau
-$ mau deploy
+## Example Usage
+
+```typescript
+// Example API call
+const response = await fetch('http://localhost:3000/agent/chat', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    message: 'Generate a table with 3 columns and 5 rows of random data',
+    threadId: 'user-123',
+  }),
+});
+
+// Handle streaming response
+const reader = response.body.getReader();
+// Process the stream...
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Extending the Agent
 
-## Resources
+### Adding Custom Tools
 
-Check out a few resources that may come in handy when working with NestJS:
+1. Create a new tool file in `src/modules/agent/tools/`
+2. Define input/output schemas using Zod
+3. Create a new tool using `DynamicStructuredTool`
+4. Add the tool to the agent in `src/modules/agent/services/agent.ts`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Example:
 
-## Support
+```typescript
+// New tool implementation
+export const myCustomTool = new DynamicStructuredTool({
+  name: 'my_custom_tool',
+  description: 'Description of what the tool does',
+  schema: z.object({
+    // Define input parameters
+  }),
+  func: async (input) => {
+    // Implement tool functionality
+    return result;
+  },
+});
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+// Add to agent.ts
+tools: [randomTableGeneratorTool, myCustomTool],
+```
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT License](LICENSE)
