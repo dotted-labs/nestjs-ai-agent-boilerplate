@@ -5,9 +5,13 @@ import axios from 'axios';
 // --- Input and Output Schemas ---
 
 const inputSchema = z.object({
-  latitude: z.number().describe('Latitude of the center point for the search.'),
+  latitude: z
+    .number()
+    .optional()
+    .describe('Latitude of the center point for the search.'),
   longitude: z
     .number()
+    .optional()
     .describe('Longitude of the center point for the search.'),
   radius: z
     .number()
@@ -37,9 +41,10 @@ const placeSchema = z.object({
 });
 
 const outputSchema = z.object({
-  places: z
+  data: z
     .array(placeSchema)
     .describe('List of places found near the coordinates.'),
+  message: z.string().describe('Message to the user.'),
 });
 
 // --- Interfaces ---
@@ -61,11 +66,14 @@ export const placesTool = new DynamicStructuredTool({
         'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
 
       const params = {
-        location: `${input.latitude},${input.longitude}`,
         radius: input.radius,
         key: apiKey,
         keyword: input.query, // Use 'keyword' for broader filtering based on query
       };
+
+      if (input.latitude || input.longitude) {
+        params['location'] = `${input.latitude},${input.longitude}`;
+      }
 
       // Remove keyword if not provided
       if (!params.keyword) {
@@ -92,7 +100,8 @@ export const placesTool = new DynamicStructuredTool({
       }));
 
       return outputSchema.parse({
-        places,
+        data: places,
+        message: 'Places found successfully',
       });
     } catch (error: unknown) {
       console.error('Error searching for places:', error);

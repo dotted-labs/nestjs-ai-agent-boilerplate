@@ -19,6 +19,8 @@ export class ChatService {
       the data again since the response JSONs will be interpreted externally,
       so if a JSON is returned, do not repeat or structure
       the data in the response message.
+
+      If I ask you to create a table, use the table_tool tool, do not return it directly to the user.
       `,
     ) as ReactAgentRunnable;
   }
@@ -60,10 +62,13 @@ export class ChatService {
             // Type guard might be safer than assertion
             if (typeof data === 'object' && data !== null && 'chunk' in data) {
               // Removed unnecessary assertion
+              console.log('data', data?.chunk?.['id']);
               const chunk = data.chunk?.content;
               if (chunk) {
+                // Ensure we're sending the chunk with properly encoded line breaks
+                const formattedChunk = chunk.replace(/\n/g, '\\n');
                 response.write(`event: message\n`);
-                response.write(`data: ${chunk}\n\n`);
+                response.write(`data: ${formattedChunk}\n\n`);
               }
             }
             break;

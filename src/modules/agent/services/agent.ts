@@ -4,7 +4,7 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 
 // Import the random table generator tool
 import { randomTableGeneratorTool } from '../tools/table.tool';
-import { placesTool } from '../tools';
+import { placesTool, weatherTool } from '../tools';
 import { unsplashTool } from '../tools/unsplash.tool';
 import { ConfigService } from '../../../config/config.service';
 
@@ -33,7 +33,7 @@ export const createAgent = (
    */
   return createReactAgent({
     llm,
-    tools: [randomTableGeneratorTool, placesTool, unsplashTool],
+    tools: [randomTableGeneratorTool, placesTool, unsplashTool, weatherTool],
     checkpointSaver: memory,
     // (Optionally, an initial system message could be added with messageModifier, etc.)
     stateModifier: systemPrompt,
