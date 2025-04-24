@@ -13,10 +13,11 @@ export class ChatService {
     this.agent = createAgent(
       this.configService.openAiModel,
       this.configService.openAiApiKey,
+      this.configService,
       `
       When using a tool, you can comment on the data obtained but without returning
       the data again since the response JSONs will be interpreted externally,
-      so if a table or complex JSON is returned, do not repeat or structure
+      so if a JSON is returned, do not repeat or structure
       the data in the response message.
       `,
     ) as ReactAgentRunnable;

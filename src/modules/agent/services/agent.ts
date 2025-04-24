@@ -4,10 +4,14 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 
 // Import the random table generator tool
 import { randomTableGeneratorTool } from '../tools/table.tool';
+import { placesTool } from '../tools';
+import { unsplashTool } from '../tools/unsplash.tool';
+import { ConfigService } from '../../../config/config.service';
 
 export const createAgent = (
   modelName: string,
   openAIApiKey: string,
+  configService: ConfigService,
   systemPrompt: string,
 ) => {
   // Language model configuration (OpenAI GPT-4 in this example).
@@ -29,8 +33,8 @@ export const createAgent = (
    */
   return createReactAgent({
     llm,
-    tools: [randomTableGeneratorTool], // List of tools available to the agent
-    checkpointSaver: memory, // Allows persisting the conversation state by threadId
+    tools: [randomTableGeneratorTool, placesTool, unsplashTool],
+    checkpointSaver: memory,
     // (Optionally, an initial system message could be added with messageModifier, etc.)
     stateModifier: systemPrompt,
   });
