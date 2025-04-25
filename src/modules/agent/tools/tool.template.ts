@@ -1,9 +1,31 @@
+/* -------------------------------------------------------------------------- */
+/*                            Tool Template File                              */
+/* -------------------------------------------------------------------------- */
+// This template provides a standardized structure for creating new tools in the agent system.
+// Tools are specialized functions that allow the AI agent to interact with external systems,
+// retrieve information, or perform specific operations.
+//
+// How to use this template:
+// 1. Duplicate this file and rename it to reflect your tool's purpose (e.g., weather.tool.ts)
+// 2. Define your input schema using Zod to specify what parameters your tool accepts
+// 3. Define your output schema to ensure consistent return data structure
+// 4. Implement the tool's core functionality in the execute function
+// 5. Export your tool and register it in the agent configuration (see agent.ts)
+//
+// IMPORTANT:
+// - Each tool should have a clear, single responsibility
+// - Provide detailed descriptions for all parameters to help the AI understand when to use the tool
+// - Handle errors gracefully and return informative error messages
+// - Consider rate limits and performance when making external API calls
+
+// Import any necessary external libraries or modules (e.g., axios for HTTP requests)
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-// Import any necessary external libraries or modules (e.g., axios for HTTP requests)
-// import axios from 'axios';
 
-// --- Input Schema ---
+/* -------------------------------------------------------------------------- */
+/*                               Input Schema                                 */
+/* -------------------------------------------------------------------------- */
+
 // Define the expected input structure for your tool using Zod.
 // This provides runtime validation and type safety.
 // Use .describe() to add descriptions for each field, which Langchain can use.
@@ -16,7 +38,10 @@ const ToolInputSchema = z.object({
   param2: z.number().optional().describe('Description for parameter 2.'),
 });
 
-// --- Output Schema ---
+/* -------------------------------------------------------------------------- */
+/*                               Output Schema                                */
+/* -------------------------------------------------------------------------- */
+
 // Define the expected output structure for your tool using Zod.
 // This helps ensure the tool returns data in a consistent format.
 
@@ -41,13 +66,19 @@ const ToolOutputSchema = z.object({
   // summary: z.string().optional().describe('A summary of the operation.'),
 });
 
-// --- Interfaces ---
+/* -------------------------------------------------------------------------- */
+/*                                 Interfaces                                 */
+/* -------------------------------------------------------------------------- */
+
 // Define TypeScript interfaces inferred from the Zod schemas.
 // These provide static type checking during development.
 export type ToolInput = z.infer<typeof ToolInputSchema>;
 export type ToolOutput = z.infer<typeof ToolOutputSchema>;
 
-// --- Tool Implementation ---
+/* -------------------------------------------------------------------------- */
+/*                           Tool Implementation                              */
+/* -------------------------------------------------------------------------- */
+
 // Create an instance of DynamicStructuredTool.
 export const genericTool = new DynamicStructuredTool({
   // --- Configuration ---
@@ -60,7 +91,9 @@ export const genericTool = new DynamicStructuredTool({
   // It receives the validated input (matching ToolInput type) and must return a promise resolving to the output (matching ToolOutput type).
   func: async (input: ToolInput): Promise<ToolOutput> => {
     try {
-      // --- 1. Setup (Optional) ---
+      /* -------------------------------------------------------------------------- */
+      /*                             1. Setup (Optional)                            */
+      /* -------------------------------------------------------------------------- */
       // Retrieve API keys or configuration from environment variables or config services.
       // const apiKey = process.env.YOUR_API_KEY_ENV_VAR;
       // if (!apiKey) {
@@ -68,7 +101,9 @@ export const genericTool = new DynamicStructuredTool({
       // }
       // const baseUrl = 'https://api.example.com/endpoint';
 
-      // --- 2. Prepare Request (If applicable) ---
+      /* -------------------------------------------------------------------------- */
+      /*                        2. Prepare Request (If applicable)                  */
+      /* -------------------------------------------------------------------------- */
       // Construct parameters or request body for an external API call based on the input.
       // const params = {
       //   query: input.query,
@@ -76,7 +111,9 @@ export const genericTool = new DynamicStructuredTool({
       //   apiKey: apiKey,
       // };
 
-      // --- 3. Execute Core Logic ---
+      /* -------------------------------------------------------------------------- */
+      /*                            3. Execute Core Logic                           */
+      /* -------------------------------------------------------------------------- */
       // Implement the main functionality here.
       // This might involve calling external APIs, interacting with databases, or performing calculations.
       console.log('Executing tool logic with input:', input);
@@ -95,7 +132,9 @@ export const genericTool = new DynamicStructuredTool({
       ];
       // ---
 
-      // --- 4. Process Results ---
+      /* -------------------------------------------------------------------------- */
+      /*                             4. Process Results                             */
+      /* -------------------------------------------------------------------------- */
       // Map or transform the data received from the core logic into the structure defined by ToolOutputSchema.
       // Ensure all required fields in the output schema are populated.
       const outputData = {
@@ -109,12 +148,16 @@ export const genericTool = new DynamicStructuredTool({
         // summary: `Successfully processed ${processedResults.length} items.`,
       };
 
-      // --- 5. Validate and Return Output ---
+      /* -------------------------------------------------------------------------- */
+      /*                        5. Validate and Return Output                       */
+      /* -------------------------------------------------------------------------- */
       // Use the output schema's parse method to validate the final data before returning.
       // This ensures the output conforms to the expected structure.
       return ToolOutputSchema.parse(outputData);
     } catch (error: unknown) {
-      // --- Error Handling ---
+      /* -------------------------------------------------------------------------- */
+      /*                              Error Handling                                */
+      /* -------------------------------------------------------------------------- */
       // Implement robust error handling. Log the error for debugging.
       console.error(`Error executing ${genericTool.name}:`, error);
 

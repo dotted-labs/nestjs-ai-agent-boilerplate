@@ -1,28 +1,29 @@
 import { HumanMessage } from '@langchain/core/messages';
+import { CompiledStateGraph } from '@langchain/langgraph';
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { ConfigService } from '../../../config/config.service';
-import { ReactAgentRunnable } from '../../../types';
-import { createAgent } from './agent'; // Import the configured agent
+import { graph } from '../graphs/default.graph';
 
 @Injectable()
 export class ChatService {
-  private agent: ReactAgentRunnable;
+  private agent: CompiledStateGraph<any, any, any, any, any, any>;
 
   constructor(private configService: ConfigService) {
-    this.agent = createAgent(
-      this.configService.openAiModel,
-      this.configService.openAiApiKey,
-      this.configService,
-      `
-      When using a tool, you can comment on the data obtained but without returning
-      the data again since the response JSONs will be interpreted externally,
-      so if a JSON is returned, do not repeat or structure
-      the data in the response message.
+    // this.agent = createAgent(
+    //   this.configService.openAiModel,
+    //   this.configService.openAiApiKey,
+    //   this.configService,
+    //   `
+    //   When using a tool, you can comment on the data obtained but without returning
+    //   the data again since the response JSONs will be interpreted externally,
+    //   so if a JSON is returned, do not repeat or structure
+    //   the data in the response message.
 
-      If I ask you to create a table, use the table_tool tool, do not return it directly to the user.
-      `,
-    ) as ReactAgentRunnable;
+    //   If I ask you to create a table, use the table_tool tool, do not return it directly to the user.
+    //   `,
+    // ) as ReactAgentRunnable;
+    this.agent = graph;
   }
 
   /**
@@ -31,11 +32,7 @@ export class ChatService {
    * @param threadId Conversation thread identifier (for persistent context).
    * @param response Express Response object to send SSE events.
    */
-  async chat(
-    message: string,
-    threadId: string,
-    response: Response,
-  ): Promise<void> {
+  async chat(message: string, threadId: string, response: Response): Promise<void> {
     // Configure SSE headers
     response.setHeader('Content-Type', 'text/event-stream');
     response.setHeader('Cache-Control', 'no-cache');
@@ -47,13 +44,18 @@ export class ChatService {
 
     // Invoke the agent in streaming mode.
     // We use configurable.thread_id so the agent uses the memory associated with this thread.
-    const config = { configurable: { thread_id: threadId }, version: 'v2' };
 
     try {
       // Iterate over the agent's output events (token by token)
       const agentStream = this.agent.streamEvents(
         { messages: [userMessage] },
-        config,
+        {
+          configurable: {
+            model: this.configService.openAiModel,
+            thread_id: threadId,
+          },
+          version: 'v2',
+        },
       );
 
       for await (const { event, data } of agentStream) {
@@ -75,15 +77,11 @@ export class ChatService {
           }
           case 'on_tool_start': {
             // Type guard
-            if (
-              typeof data === 'object' &&
-              data !== null &&
-              'tool_name' in data
-            ) {
+            if (typeof data === 'object' && data !== null && 'tool_name' in data) {
               // Removed unnecessary assertion
               const toolName = data.tool_name ?? 'unknown tool';
               response.write(`event: tool_start\n`);
-              response.write(`data: starting tool ${toolName}\n\n`);
+              response.write(`data: starting tool ${JSON.stringify(toolName)}\n\n`);
             }
             break;
           }
