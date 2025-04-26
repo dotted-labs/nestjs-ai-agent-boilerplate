@@ -2,6 +2,12 @@
 
 A modern NestJS-based boilerplate for building AI agents using LangChain.js and LangGraph. This project provides a solid foundation for creating AI-powered applications with streaming responses, tool execution, and persistent conversation memory.
 
+> You can quickly test your LangGraph graphs locally with:
+>
+> ```bash
+> npx @langchain/langgraph-cli@latest dev
+> ```
+
 ## Features
 
 - **AI Agent Integration**: Built with LangChain.js and LangGraph for sophisticated agent workflows

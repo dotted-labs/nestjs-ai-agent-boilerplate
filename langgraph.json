@@ -3,7 +3,9 @@
   "dockerfile_lines": [],
   "dependencies": ["."],
   "graphs": {
-    "agent": "./src/modules/agent/graphs/memory.graph.ts:graph"
+    "agent": "./src/modules/agent/graphs/default.graph.ts:graph",
+    "default": "./src/modules/agent/graphs/default.graph.ts:graph",
+    "memory": "./src/modules/agent/graphs/memory.graph.ts:graph"
   },
   "env": ".env"
 }
