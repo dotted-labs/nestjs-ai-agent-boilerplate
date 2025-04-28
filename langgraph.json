@@ -5,7 +5,9 @@
   "graphs": {
     "agent": "./src/modules/agent/graphs/default.graph.ts:graph",
     "default": "./src/modules/agent/graphs/default.graph.ts:graph",
-    "memory": "./src/modules/agent/graphs/memory.graph.ts:graph"
+    "memory": "./src/modules/agent/graphs/memory.graph.ts:graph",
+    "rag-auto": "./src/modules/agent/graphs/rag-auto.graph.ts:graph",
+    "rag-tool": "./src/modules/agent/graphs/rag-tool.graph.ts:graph"
   },
   "env": ".env"
 }
